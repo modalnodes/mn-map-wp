@@ -99,6 +99,7 @@ class Mn_Map_Wp_Public {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/mn-map-wp-public.js', array( 'jquery' ), $this->version, false );
 		wp_enqueue_script( "leaflet", '//unpkg.com/leaflet@1.2.0/dist/leaflet.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( "mustache_front", '//cdn.jsdelivr.net/npm/mustache@2.3.0/mustache.min.js', array( 'jquery' ), $this->version, false );
 
 	}
 
@@ -120,14 +121,19 @@ class Mn_Map_Wp_Public {
 			'zoom' => '16',
 			'minzoom' => '1',
 			'maxzoom' => '19',
-			'bounds' => 'map'
+			'bounds' => 'map',
+			'localize' => 'true'
 		), $atts, 'mn-map' );
 
-		$ret = "<div id='{$atts["id"]}' style='width:100%;height:400px;'></div>";
-
 		$map_id = "map__{$atts["id"]}";
+
+		$ret = "";
+		$ret .= "<div id='{$atts["id"]}' style='width:100%;height:400px;'></div>";
 		$ret .= "<script>";
 		$ret .= "maps['{$map_id}'] = L.map('{$atts['id']}').setView({$atts['center']}, {$atts['zoom']});";
+		if($atts["localize"] == "true"){
+			$ret .= "maps['{$map_id}'].locate({setView: true, maxZoom: {$atts['zoom']}});";
+		}
 		$ret .= "</script>";
 
 		$pre_ret .= do_shortcode($content);
@@ -149,6 +155,7 @@ class Mn_Map_Wp_Public {
 		$atts = shortcode_atts(
 		array(
 			'map' => 'carto_white',
+			'mode' => 'raster'
 		), $atts, 'baselayer' );
 
 		$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
@@ -170,11 +177,23 @@ class Mn_Map_Wp_Public {
 			'name' => 'Quakes (last hour)',
 			'format' => 'geojson'
 		), $atts, 'datalayer' );
+
+		$cntt = preg_replace('/[\n\r]/', ' ', $content);
+
 		$ret = "";
 		$ret .= "<script>";
 		$ret .= "
 		jQuery.getJSON('{$atts["url"]}', function(data){
-			L.geoJSON(data).addTo(maps['###MAP###']);
+			L.geoJSON(data, {
+				onEachFeature: function(feature, layer) {
+					if (feature.properties) {
+						console.log('FIGA');
+						var tl = `{$cntt}`;
+						var pc = Mustache.render(tl,feature.properties);
+						layer.bindPopup(pc);
+					}
+				}
+			}).addTo(maps['###MAP###']);
 		})";
 		$ret .= "</script>";
 		return $ret;
