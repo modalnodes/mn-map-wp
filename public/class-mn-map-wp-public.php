@@ -122,15 +122,23 @@ class Mn_Map_Wp_Public {
 			'minzoom' => '1',
 			'maxzoom' => '19',
 			'bounds' => 'map',
-			'localize' => 'true'
+			'localize' => 'true',
+			'layerswitcher' => 'no',
+			'height' => '400px',
+			'width' => '100%'	
 		), $atts, 'mn-map' );
 
 		$map_id = "map__{$atts["id"]}";
 
 		$ret = "";
-		$ret .= "<div id='{$atts["id"]}' style='width:100%;height:400px;'></div>";
+		$ret .= "<div id='{$atts["id"]}' style='width:{$atts["width"]};height:{$atts["height"]};'></div>";
 		$ret .= "<script>";
 		$ret .= "maps['{$map_id}'] = L.map('{$atts['id']}').setView({$atts['center']}, {$atts['zoom']});";
+		$ret .= "maps['{$map_id}']['__baseMaps'] = {};";
+		$ret .= "maps['{$map_id}']['__overlayMaps'] = {};";
+		$ret .= "maps['{$map_id}']['__baseMaps_list'] = [];";
+		$ret .= "maps['{$map_id}']['__overlayMaps_list'] = [];";
+
 		if($atts["localize"] == "true"){
 			$ret .= "maps['{$map_id}'].locate({setView: true, maxZoom: {$atts['zoom']}});";
 		}
@@ -139,7 +147,14 @@ class Mn_Map_Wp_Public {
 		$pre_ret .= do_shortcode($content);
 		$pre_ret = str_replace("###MAP###", $map_id, $pre_ret);
 		$ret .= $pre_ret;
-		$ret .= "</script>";
+		
+
+		if($atts["layerswitcher"] != "no"){
+			$ret .= "<script>";
+			$ret .= "function load_layerswitcher(){L.control.layers(maps['{$map_id}']['__baseMaps'], maps['{$map_id}']['__overlayMaps']).addTo(maps['{$map_id}']);}";
+			$ret .= "setTimeout(load_layerswitcher, 500);";
+			$ret .= "</script>";
+		}
 		//$ret = preg_replace(array("<p>","</p>", "<br />"), "", $ret);
 
 		return $ret;
@@ -152,6 +167,11 @@ class Mn_Map_Wp_Public {
 			"carto_light" => "{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
 			"carto_dark" => "{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
 		);
+		$base_names = array(
+			"osm" => "OpenStreetMap",
+			"carto_light" => "CartoDB Light",
+			"carto_dark" => "CartoDB Dark Matter"
+		);
 		$atts = shortcode_atts(
 		array(
 			'map' => 'carto_white',
@@ -160,11 +180,14 @@ class Mn_Map_Wp_Public {
 
 		$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
 		$url = $base_maps[$atts["map"]];
+		$nme = $base_names[$atts["map"]];
 		$ret = "";
 		$ret .= "<script>";
-		$ret .= "L.tileLayer('$protocol://$url', {
+		$ret .= "var idx = maps['###MAP###']['__baseMaps_list'].push(L.tileLayer('$protocol://$url', {
 			maxZoom: 18, attribution: 'Copyright: <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, Copyright: <a href=\"https://carto.com/attribution\">CARTO</a>'
-		}).addTo(maps['###MAP###']);";	
+		})) -1;";
+		$ret .= "maps['###MAP###']['__baseMaps_list'][idx].addTo(maps['###MAP###']);";
+		$ret .= "maps['###MAP###']['__baseMaps']['{$nme}'] = maps['###MAP###']['__baseMaps_list'][idx];";	
 		$ret .= "</script>";
 		return $ret;
 	}
@@ -182,9 +205,10 @@ class Mn_Map_Wp_Public {
 
 		$ret = "";
 		$ret .= "<script>";
+		$nme = $atts["name"];
 		$ret .= "
 		jQuery.getJSON('{$atts["url"]}', function(data){
-			L.geoJSON(data, {
+			var idx = maps['###MAP###']['__overlayMaps_list'].push(L.geoJSON(data, {
 				onEachFeature: function(feature, layer) {
 					if (feature.properties) {
 						console.log('FIGA');
@@ -193,7 +217,9 @@ class Mn_Map_Wp_Public {
 						layer.bindPopup(pc);
 					}
 				}
-			}).addTo(maps['###MAP###']);
+			}))-1;
+			maps['###MAP###']['__overlayMaps_list'][idx].addTo(maps['###MAP###']);
+			maps['###MAP###']['__overlayMaps']['{$nme}'] = maps['###MAP###']['__overlayMaps_list'][idx];
 		})";
 		$ret .= "</script>";
 		return $ret;
