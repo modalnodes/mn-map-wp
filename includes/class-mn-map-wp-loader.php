@@ -123,6 +123,10 @@ class Mn_Map_Wp_Loader {
 		foreach ( $this->actions as $hook ) {
 			add_action( $hook['hook'], array( $hook['component'], $hook['callback'] ), $hook['priority'], $hook['accepted_args'] );
 		}
+		
+		remove_filter( 'the_content', 'wpautop' );
+		add_filter( 'the_content', 'wpautop' , 99);
+		add_filter( 'the_content', 'shortcode_unautop',100 );
 
 	}
 
