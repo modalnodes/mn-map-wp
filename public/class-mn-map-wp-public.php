@@ -105,8 +105,7 @@ class Mn_Map_Wp_Public {
 	public function register_shortcodes(){
 
 		remove_filter( 'the_content', 'wpautop' );
-		add_filter( 'the_content', 'wpautop' , 99);
-		add_filter( 'the_content', 'shortcode_unautop',100 );
+		add_filter( 'the_content', 'shortcode_unautop', 100 );
 
 		add_shortcode( 'mn-map',    array( $this, 'mn_map_container')  );
 		add_shortcode( 'baselayer', array( $this, 'mn_map_baselayer_function')  );
@@ -129,12 +128,13 @@ class Mn_Map_Wp_Public {
 		$map_id = "map__{$atts["id"]}";
 		$ret .= "<script>";
 		$ret .= "maps['{$map_id}'] = L.map('{$atts['id']}').setView({$atts['center']}, {$atts['zoom']});";
+		$ret .= "</script>";
 
 		$pre_ret .= do_shortcode($content);
 		$pre_ret = str_replace("###MAP###", $map_id, $pre_ret);
 		$ret .= $pre_ret;
 		$ret .= "</script>";
-		$ret = preg_replace(array("<p>","</p>", "<br />"), "", $ret);
+		//$ret = preg_replace(array("<p>","</p>", "<br />"), "", $ret);
 
 		return $ret;
 	}
@@ -153,10 +153,13 @@ class Mn_Map_Wp_Public {
 
 		$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
 		$url = $base_maps[$atts["map"]];
-		return "L.tileLayer('$protocol://$url', {
+		$ret = "";
+		$ret .= "<script>";
+		$ret .= "L.tileLayer('$protocol://$url', {
 			maxZoom: 18, attribution: 'Copyright: <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, Copyright: <a href=\"https://carto.com/attribution\">CARTO</a>'
 		}).addTo(maps['###MAP###']);";	
-		
+		$ret .= "</script>";
+		return $ret;
 	}
 
 
@@ -167,10 +170,14 @@ class Mn_Map_Wp_Public {
 			'name' => 'Quakes (last hour)',
 			'format' => 'geojson'
 		), $atts, 'datalayer' );
-		return "
-		$.getJSON({$atts["url"]}, function(data){
+		$ret = "";
+		$ret .= "<script>";
+		$ret .= "
+		jQuery.getJSON('{$atts["url"]}', function(data){
 			L.geoJSON(data).addTo(maps['###MAP###']);
 		})";
+		$ret .= "</script>";
+		return $ret;
 	}
 	
 
