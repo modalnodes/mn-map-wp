@@ -117,7 +117,7 @@ class Mn_Map_Wp_Public {
 		$atts = shortcode_atts(
 		array(
 			'id' => 'map',
-			'center' => '[11,22]',
+			'center' => '11,22',
 			'zoom' => '16',
 			'minzoom' => '1',
 			'maxzoom' => '19',
@@ -133,7 +133,7 @@ class Mn_Map_Wp_Public {
 		$ret = "";
 		$ret .= "<div id='{$atts["id"]}' style='width:{$atts["width"]};height:{$atts["height"]};'></div>";
 		$ret .= "<script>";
-		$ret .= "maps['{$map_id}'] = L.map('{$atts['id']}').setView({$atts['center']}, {$atts['zoom']});";
+		$ret .= "maps['{$map_id}'] = L.map('{$atts['id']}').setView([{$atts['center']}], {$atts['zoom']});";
 		$ret .= "maps['{$map_id}']['__baseMaps'] = {};";
 		$ret .= "maps['{$map_id}']['__overlayMaps'] = {};";
 		$ret .= "maps['{$map_id}']['__baseMaps_list'] = [];";
