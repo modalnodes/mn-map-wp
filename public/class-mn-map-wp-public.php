@@ -163,20 +163,22 @@ class Mn_Map_Wp_Public {
 
 	function mn_map_baselayer_function( $atts , $content = null ) {
 		$base_maps = array(
-			"osm" => "{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-			"carto_light" => "{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-			"carto_dark" => "{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-			"stamen_toner" => "a.tile.stamen.com/toner/{z}/{x}/{y}.png"
+			"osm" => "{a|b|c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+			"carto_light" => "cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
+			"carto_dark" => "cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png",
+			"stamen_toner" => "a.tile.stamen.com/toner/{z}/{x}/{y}.png",
+			"stamen_watercolor" => "c.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg"
 		);
 		$base_names = array(
 			"osm" => "OpenStreetMap",
 			"carto_light" => "CartoDB Light",
 			"carto_dark" => "CartoDB Dark Matter",
-			"stamen_toner" => "Stamen Toner"
+			"stamen_toner" => "Stamen Toner",
+			"stamen_watercolor" => "Stamen Watercolor"
 		);
 		$atts = shortcode_atts(
 		array(
-			'map' => 'osm',
+			'map' => 'carto_light',
 			'mode' => 'raster'
 		), $atts, 'baselayer' );
 
