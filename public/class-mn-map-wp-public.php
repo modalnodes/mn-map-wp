@@ -166,7 +166,7 @@ class Mn_Map_Wp_Public {
 			"osm" => "{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 			"carto_light" => "{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
 			"carto_dark" => "{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-			"stamen_toner" => "a.tile.stamen.com/toner/{z}/{x}/{y}.png
+			"stamen_toner" => "a.tile.stamen.com/toner/{z}/{x}/{y}.png"
 		);
 		$base_names = array(
 			"osm" => "OpenStreetMap",
