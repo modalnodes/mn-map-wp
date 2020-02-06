@@ -163,14 +163,16 @@ class Mn_Map_Wp_Public {
 
 	function mn_map_baselayer_function( $atts , $content = null ) {
 		$base_maps = array(
-			"osm" => "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+			"osm" => "{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 			"carto_light" => "{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-			"carto_dark" => "{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
+			"carto_dark" => "{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+			"stamen_toner" => "a.tile.stamen.com/toner/{z}/{x}/{y}.png
 		);
 		$base_names = array(
 			"osm" => "OpenStreetMap",
 			"carto_light" => "CartoDB Light",
-			"carto_dark" => "CartoDB Dark Matter"
+			"carto_dark" => "CartoDB Dark Matter",
+			"stamen_toner" => "Stamen Toner"
 		);
 		$atts = shortcode_atts(
 		array(
