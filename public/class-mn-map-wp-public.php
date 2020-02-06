@@ -163,7 +163,7 @@ class Mn_Map_Wp_Public {
 
 	function mn_map_baselayer_function( $atts , $content = null ) {
 		$base_maps = array(
-			"osm" => "",
+			"osm" => "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 			"carto_light" => "{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
 			"carto_dark" => "{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
 		);
@@ -174,7 +174,7 @@ class Mn_Map_Wp_Public {
 		);
 		$atts = shortcode_atts(
 		array(
-			'map' => 'carto_white',
+			'map' => 'osm',
 			'mode' => 'raster'
 		), $atts, 'baselayer' );
 
